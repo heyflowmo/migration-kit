@@ -6,7 +6,7 @@ Built as an internal tool at [Trolley](https://trolley.com) to help onboarding t
 
 ## Live Demo
 
-👉 **[Try it live](https://migration-kit.netlify.app)** — no API keys needed, sample data included.
+👉 **[Try it live](https://migrationkit.netlify.app)** — no API keys needed, sample data included.
 
 ## What It Does
 
