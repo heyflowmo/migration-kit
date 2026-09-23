@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payout Platform Migration Kit</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .step { display: none; }
+        .step.active { display: block; }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #4f46e5; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .stat-card { transition: all 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .fade-in { animation: fadeIn 0.4s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-5xl mx-auto p-6">
+
+        <!-- Header (hidden on landing) -->
+        <div id="appHeader" class="bg-white rounded-lg shadow-sm p-6 mb-6 hidden">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Payout Platform Migration Kit</h1>
+                    <p class="text-gray-500 text-sm">Extract, map, and migrate payout recipient data between platforms</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span id="stepIndicator" class="text-sm text-gray-500">Step 1 of 6</span>
+                </div>
+            </div>
+            <div class="mt-4 h-2 bg-gray-200 rounded-full">
+                <div id="progressBar" class="h-2 bg-indigo-500 rounded-full transition-all duration-300" style="width: 16.6%"></div>
+            </div>
+        </div>
+
+        <!-- Step 0: Landing Page -->
+        <div id="step0" class="step active">
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <!-- Hero -->
+                <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white p-12 text-center">
+                    <div class="text-5xl mb-4">🔄</div>
+                    <h1 class="text-3xl font-bold mb-3">Payout Platform Migration Kit</h1>
+                    <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Extract recipient data from your current payout platform, preview and map fields, then export in any format — CSV, JSON, or direct API.</p>
+                </div>
+
+                <!-- How it works -->
+                <div class="p-8">
+                    <h2 class="text-lg font-semibold text-center text-gray-800 mb-6">How It Works</h2>
+                    <div class="grid grid-cols-3 gap-6 mb-8">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-indigo-600 font-bold">1</span>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1">Connect & Extract</h3>
+                            <p class="text-sm text-gray-500">Connect to your source platform via API and pull recipient data automatically.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-indigo-600 font-bold">2</span>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1">Preview & Map</h3>
+                            <p class="text-sm text-gray-500">Review your data, select accounts, and map source fields to your destination platform.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                                <span class="text-indigo-600 font-bold">3</span>
+                            </div>
+                            <h3 class="font-medium text-gray-800 mb-1">Export & Migrate</h3>
+                            <p class="text-sm text-gray-500">Download CSVs, JSON, or push directly via API. Recipients, verifications, and payment history.</p>
+                        </div>
+                    </div>
+
+                    <!-- What you get -->
+                    <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                        <h3 class="font-medium text-gray-800 mb-3">What You Can Migrate</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-start space-x-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">Recipients</span>
+                                    <p class="text-xs text-gray-500">Names, emails, addresses, business details</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">Verification Status</span>
+                                    <p class="text-xs text-gray-500">Individual KYC and business KYB data</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">Payment History</span>
+                                    <p class="text-xs text-gray-500">Historical transfers and payout records</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="text-green-500 mt-0.5">✓</span>
+                                <div>
+                                    <span class="text-sm font-medium text-gray-700">Bank Account References</span>
+                                    <p class="text-xs text-gray-500">Last-4 digits and routing info for audit trails</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Limitations -->
+                    <div class="border border-amber-200 bg-amber-50 rounded-lg p-4 mb-8">
+                        <h3 class="font-medium text-amber-800 mb-2">Migration Limitations (By Design)</h3>
+                        <p class="text-sm text-amber-700">Full bank account numbers, identity documents, and raw verification files are never exposed by source platform APIs — this is a security feature, not a limitation of this tool. Recipients will need to re-enter payment details on the destination platform.</p>
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="goToStep(1)" class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-lg font-medium">
+                            Get Started →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Source Selection -->
+        <div id="step1" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <h2 class="text-lg font-semibold mb-2">Select Source Platform</h2>
+                <p class="text-sm text-gray-500 mb-4">Choose the platform you're migrating from.</p>
+                <div class="grid grid-cols-3 gap-4">
+                    <button onclick="selectSource('stripe')" class="source-btn p-6 border-2 border-gray-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition-all text-center">
+                        <div class="text-3xl mb-2">💳</div>
+                        <div class="font-medium">Stripe Connect</div>
+                        <div class="text-sm text-gray-500">Connected Accounts</div>
+                    </button>
+                    <button disabled class="p-6 border-2 border-gray-100 rounded-lg text-center opacity-50 cursor-not-allowed">
+                        <div class="text-3xl mb-2">🌐</div>
+                        <div class="font-medium text-gray-400">Airwallex</div>
+                        <div class="text-sm text-gray-400">Coming Soon</div>
+                    </button>
+                    <button disabled class="p-6 border-2 border-gray-100 rounded-lg text-center opacity-50 cursor-not-allowed">
+                        <div class="text-3xl mb-2">💰</div>
+                        <div class="font-medium text-gray-400">Tipalti</div>
+                        <div class="text-sm text-gray-400">Coming Soon</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Connect -->
+        <div id="step2" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <h2 class="text-lg font-semibold mb-2">Connect to Stripe</h2>
+                <p class="text-sm text-gray-500 mb-4">Enter your Stripe Secret Key. This runs entirely in your browser — your key is never sent to any server except Stripe's API.</p>
+                <div class="space-y-4">
+                    <!-- Demo Option -->
+                    <div class="border-2 border-dashed border-indigo-200 rounded-lg p-4 bg-indigo-50 text-center">
+                        <p class="text-sm text-indigo-700 mb-2">No API key? Try the full experience with sample data.</p>
+                        <button onclick="loadSampleData()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            ▶ Try with Sample Data
+                        </button>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <div class="flex-1 border-t border-gray-200"></div>
+                        <span class="text-xs text-gray-400 uppercase">or connect your own</span>
+                        <div class="flex-1 border-t border-gray-200"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Stripe Secret Key</label>
+                        <input type="password" id="stripeKey" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="sk_test_... or sk_live_...">
+                        <p class="text-xs text-gray-400 mt-1">Runs entirely in your browser. Your key is only sent to Stripe's API.</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="goToStep(1)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Back</button>
+                        <button onclick="connectAndFetch()" id="connectBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                            Connect & Fetch Data
+                        </button>
+                    </div>
+                    <div id="fetchStatus" class="hidden">
+                        <div class="flex items-center space-x-2 text-gray-600">
+                            <div class="loader"></div>
+                            <span id="fetchStatusText">Fetching connected accounts...</span>
+                        </div>
+                    </div>
+                    <div id="fetchError" class="hidden text-red-600 text-sm"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Preview Data -->
+        <div id="step3" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Preview Extracted Data</h2>
+                    <span id="accountCount" class="text-sm bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full"></span>
+                </div>
+                
+                <!-- Filters and Selection Controls -->
+                <div class="flex items-center justify-between mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-600">Filter:</label>
+                            <select id="typeFilter" onchange="filterAccounts()" class="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500">
+                                <option value="all">All Types</option>
+                                <option value="individual">Individual</option>
+                                <option value="company">Company</option>
+                            </select>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            <span id="selectedCount">0</span> of <span id="visibleCount">0</span> selected
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="selectAllVisible()" class="px-3 py-1.5 text-sm text-indigo-600 hover:bg-indigo-50 rounded-lg">Select All</button>
+                        <button onclick="deselectAll()" class="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Deselect All</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto border rounded-lg" style="max-height: 400px; overflow-y: auto;">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-3 text-left">
+                                    <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()" class="rounded text-indigo-600 focus:ring-indigo-500">
+                                </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="previewTable" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex space-x-3 mt-4">
+                    <button onclick="goToStep(2)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Back</button>
+                    <button onclick="proceedWithSelected()" id="continueBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue to Summary</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Summary Dashboard (NEW) -->
+        <div id="step4" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <h2 class="text-lg font-semibold mb-2">Migration Summary</h2>
+                <p class="text-sm text-gray-500 mb-6">Overview of the data you're about to migrate.</p>
+
+                <!-- Stat Cards -->
+                <div class="grid grid-cols-4 gap-4 mb-6">
+                    <div class="stat-card bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+                        <div class="text-sm text-indigo-600 font-medium">Total Accounts</div>
+                        <div class="text-3xl font-bold text-indigo-700" id="summaryTotal">0</div>
+                    </div>
+                    <div class="stat-card bg-blue-50 border border-blue-100 rounded-lg p-4">
+                        <div class="text-sm text-blue-600 font-medium">Individual</div>
+                        <div class="text-3xl font-bold text-blue-700" id="summaryIndividual">0</div>
+                    </div>
+                    <div class="stat-card bg-purple-50 border border-purple-100 rounded-lg p-4">
+                        <div class="text-sm text-purple-600 font-medium">Company</div>
+                        <div class="text-3xl font-bold text-purple-700" id="summaryCompany">0</div>
+                    </div>
+                    <div class="stat-card bg-green-50 border border-green-100 rounded-lg p-4">
+                        <div class="text-sm text-green-600 font-medium">Transfers</div>
+                        <div class="text-3xl font-bold text-green-700" id="summaryTransfers">0</div>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown -->
+                <div class="grid grid-cols-2 gap-6 mb-6">
+                    <!-- Verification Readiness -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-medium text-gray-800 mb-3">Verification Readiness</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Has email</span>
+                                    <span class="font-medium" id="summaryHasEmail">0</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" id="summaryEmailBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Has address</span>
+                                    <span class="font-medium" id="summaryHasAddress">0</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" id="summaryAddressBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Has bank account</span>
+                                    <span class="font-medium" id="summaryHasBank">0</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" id="summaryBankBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span class="text-gray-600">Verification gaps</span>
+                                    <span class="font-medium" id="summaryHasGaps">0</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-amber-500 h-2 rounded-full" id="summaryGapsBar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transfer Summary -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-medium text-gray-800 mb-3">Transfer History</h3>
+                        <div class="space-y-3">
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-600">Total transfers</span>
+                                <span class="text-sm font-medium" id="summaryTransferCount">0</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-600">Total volume</span>
+                                <span class="text-sm font-medium" id="summaryTransferVolume">$0.00</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-sm text-gray-600">Accounts with transfers</span>
+                                <span class="text-sm font-medium" id="summaryWithTransfers">0</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-sm text-gray-600">Countries</span>
+                                <span class="text-sm font-medium" id="summaryCountries">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Migration Outputs Preview -->
+                <div class="border rounded-lg p-4 bg-gray-50 mb-6">
+                    <h3 class="font-medium text-gray-800 mb-3">Files to be Generated</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-500">📊</span>
+                            <span class="text-sm text-gray-700">Recipients CSV (<span id="summaryRecipientsCsvCount">0</span> rows)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-green-500">📄</span>
+                            <span class="text-sm text-gray-700">Recipients API JSON (<span id="summaryRecipientsJsonCount">0</span> records)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-500">🔍</span>
+                            <span class="text-sm text-gray-700">Individual Verifications (<span id="summaryIndivVerifCount">0</span> rows)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-purple-500">🔍</span>
+                            <span class="text-sm text-gray-700">Business Verifications (<span id="summaryBizVerifCount">0</span> rows)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-amber-500">💸</span>
+                            <span class="text-sm text-gray-700">Offline Payments (<span id="summaryPaymentsCount">0</span> rows)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3">
+                    <button onclick="goToStep(3)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Back</button>
+                    <button onclick="goToStep(5)" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue to Mapping</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Field Mapping -->
+        <div id="step5" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <h2 class="text-lg font-semibold mb-2">Field Mapping</h2>
+                <p class="text-gray-500 text-sm mb-4">Map source fields to destination platform fields. Defaults are pre-configured for the most common mapping.</p>
+                
+                <div class="space-y-6">
+                    <div class="border rounded-lg overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-1/2">Source Field (Stripe)</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase w-1/2">Destination Field</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">account.id</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="id">
+                                            <option value="referenceId" selected>Reference ID</option>
+                                            <option value="email">Email</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">email</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="email">
+                                            <option value="email" selected>Email</option>
+                                            <option value="referenceId">Reference ID</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">business_type</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="business_type">
+                                            <option value="type" selected>Type</option>
+                                            <option value="tags">Tags</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">company.name</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="company_name">
+                                            <option value="name" selected>Name (Business)</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">individual.first_name</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="first_name">
+                                            <option value="firstName" selected>First Name</option>
+                                            <option value="name">Name (Business)</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">individual.last_name</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="last_name">
+                                            <option value="lastName" selected>Last Name</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3"><code class="text-sm bg-gray-100 px-2 py-1 rounded text-gray-700">country</code></td>
+                                    <td class="px-4 py-3">
+                                        <select class="mapping-select w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500" data-source="country">
+                                            <option value="country" selected>Country</option>
+                                            <option value="skip">— Skip —</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="border rounded-lg p-4 bg-amber-50 border-amber-200">
+                        <h3 class="font-medium mb-2 flex items-center text-amber-800">
+                            <span class="w-3 h-3 bg-amber-500 rounded-full mr-2"></span>
+                            Verification Data
+                        </h3>
+                        <p class="text-sm text-amber-700">Verification status will be extracted from the source platform's requirements data and exported as offline verification CSVs (Individual + Business).</p>
+                    </div>
+
+                    <div class="border rounded-lg p-4 bg-blue-50 border-blue-200">
+                        <h3 class="font-medium mb-2 flex items-center text-blue-800">
+                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
+                            Payment History
+                        </h3>
+                        <p class="text-sm text-blue-700">Historical transfers will be exported as offline payments CSV for record-keeping and reporting continuity.</p>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 mt-6">
+                    <button onclick="goToStep(4)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Back</button>
+                    <button onclick="goToStep(6)" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Continue to Export</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Export -->
+        <div id="step6" class="step">
+            <div class="bg-white rounded-lg shadow-sm p-6 fade-in">
+                <h2 class="text-lg font-semibold mb-4">Export Options</h2>
+                
+                <div class="space-y-4">
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Recipients</h3>
+                                <p class="text-sm text-gray-500" id="exportRecipientCount">0 recipients ready</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="exportRecipientsCsv" checked class="rounded text-indigo-600">
+                                    <span class="text-sm">CSV</span>
+                                </label>
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" id="exportRecipientsApi" checked class="rounded text-indigo-600">
+                                    <span class="text-sm">API JSON</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Individual Verifications</h3>
+                                <p class="text-sm text-gray-500" id="exportIndivVerifCount">0 verifications</p>
+                            </div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="exportIndivVerif" checked class="rounded text-indigo-600">
+                                <span class="text-sm">CSV</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Business Verifications</h3>
+                                <p class="text-sm text-gray-500" id="exportBizVerifCount">0 verifications</p>
+                            </div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="exportBizVerif" checked class="rounded text-indigo-600">
+                                <span class="text-sm">CSV</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="border rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Offline Payments (History)</h3>
+                                <p class="text-sm text-gray-500" id="exportPaymentCount">0 historical payments</p>
+                            </div>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="exportPayments" checked class="rounded text-indigo-600">
+                                <span class="text-sm">CSV</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Trolley API Config -->
+                    <div class="border-2 border-indigo-200 rounded-lg p-4 bg-indigo-50">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-medium text-indigo-800">Create Recipients via Trolley API</h3>
+                            <label class="flex items-center space-x-2">
+                                <input type="checkbox" id="exportTrolleyApi" class="rounded text-indigo-600" onchange="toggleTrolleyConfig()">
+                                <span class="text-sm text-indigo-700">Enable</span>
+                            </label>
+                        </div>
+                        <div id="trolleyConfigFields" class="hidden space-y-3">
+                            <p class="text-xs text-indigo-600">Recipients will be created in your Trolley account via API. Get sandbox keys free at <a href="https://dashboard.trolley.com" target="_blank" class="underline">dashboard.trolley.com</a></p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Access Key</label>
+                                    <input type="text" id="trolleyAccessKey" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Your Trolley Access Key">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Secret Key</label>
+                                    <input type="password" id="trolleySecretKey" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Your Trolley Secret Key">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 mt-6">
+                    <button onclick="goToStep(5)" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Back</button>
+                    <button onclick="executeExport()" id="exportBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                        🚀 Generate Files
+                    </button>
+                </div>
+
+                <div id="exportResults" class="hidden mt-6 border-t pt-6">
+                    <h3 class="font-medium mb-3">📦 Export Complete</h3>
+                    <div id="downloadLinks" class="space-y-2"></div>
+                </div>
+
+                <!-- Trolley API Results -->
+                <div id="trolleyApiResults" class="hidden mt-6 border-t pt-6">
+                    <h3 class="font-medium mb-3">🚀 Trolley API Creation</h3>
+                    <div id="trolleyProgress" class="mb-3">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span id="trolleyProgressText" class="text-gray-600">Creating recipients...</span>
+                            <span id="trolleyProgressCount" class="font-medium">0/0</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="trolleyProgressBar" class="bg-indigo-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div id="trolleyResultSummary" class="hidden grid grid-cols-2 gap-3">
+                        <div class="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <div class="text-sm text-green-600">Created</div>
+                            <div class="text-2xl font-bold text-green-700" id="trolleySuccessCount">0</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <div class="text-sm text-red-600">Failed</div>
+                            <div class="text-2xl font-bold text-red-700" id="trolleyFailCount">0</div>
+                        </div>
+                    </div>
+                    <div id="trolleyErrors" class="hidden mt-3 max-h-40 overflow-y-auto text-sm text-red-600 space-y-1"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="max-w-5xl mx-auto px-6 pb-8">
+        <div class="text-center text-xs text-gray-400 mt-8">
+            Payout Platform Migration Kit · Built by Mo · All data stays in your browser
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentStep = 0;
+        let selectedSource = null;
+        let stripeAccounts = [];
+        let stripeTransfers = [];
+        let selectedAccountIds = new Set();
+
+        // Step navigation
+        function goToStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+
+            const header = document.getElementById('appHeader');
+            if (step === 0) {
+                header.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+                document.getElementById('stepIndicator').textContent = `Step ${step} of 6`;
+                document.getElementById('progressBar').style.width = `${step * 16.6}%`;
+            }
+
+            // Populate summary when entering step 4
+            if (step === 4) populateSummary();
+            // Update export counts when entering step 6
+            if (step === 6) updateExportCounts();
+        }
+
+        function selectSource(source) {
+            selectedSource = source;
+            goToStep(2);
+        }
+
+        // Sample data for demo
+        function loadSampleData() {
+            const firstNames = ['James','Maria','Chen','Priya','Oliver','Fatima','Lucas','Yuki','Ahmed','Sofia','Liam','Isabella','Noah','Emma','Carlos'];
+            const lastNames = ['Smith','Garcia','Wang','Patel','Johnson','Al-Hassan','Mueller','Tanaka','Rodriguez','Kim','Brown','Silva','Wilson','Lee','Martinez'];
+            const companies = ['Neon Studios LLC','Brightwave Inc','Coral Digital Co','Summit Partners','Verdant Solutions','Atlas Group','Horizon Labs','Pixel & Code Inc','Meridian Consulting','Apex Ventures','Forge Creative','Nimbus Corp','Terraform Studios','Cascade Works','Ember Design Co'];
+            const cities = [{city:'San Francisco',state:'CA',postal:'94105'},{city:'New York',state:'NY',postal:'10001'},{city:'Austin',state:'TX',postal:'78701'},
+                {city:'Seattle',state:'WA',postal:'98101'},{city:'Chicago',state:'IL',postal:'60601'},{city:'Miami',state:'FL',postal:'33101'},
+                {city:'Denver',state:'CO',postal:'80201'},{city:'Boston',state:'MA',postal:'02101'},{city:'Portland',state:'OR',postal:'97201'},
+                {city:'Atlanta',state:'GA',postal:'30301'},{city:'Nashville',state:'TN',postal:'37201'},{city:'Salt Lake City',state:'UT',postal:'84101'}];
+            const domains = ['gmail.com','company.co','outlook.com','hey.com','fastmail.com'];
+
+            const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+            const sampleAccounts = [];
+
+            for (let i = 0; i < 47; i++) {
+                const isIndividual = Math.random() > 0.45;
+                const first = pick(firstNames);
+                const last = pick(lastNames);
+                const loc = pick(cities);
+                const hasGaps = Math.random() > 0.6;
+                const hasBank = Math.random() > 0.15;
+
+                const account = {
+                    id: `acct_sample${String(i+1).padStart(3,'0')}${Math.random().toString(36).substring(2,8)}`,
+                    email: `${first.toLowerCase()}.${last.toLowerCase()}${i}@${pick(domains)}`,
+                    business_type: isIndividual ? 'individual' : 'company',
+                    country: 'US',
+                    created: Math.floor(Date.now()/1000) - Math.floor(Math.random()*31536000),
+                    requirements: {
+                        currently_due: hasGaps ? ['verification.document'] : [],
+                        past_due: [],
+                        eventually_due: []
+                    },
+                    external_accounts: { data: hasBank ? [{ id: `ba_sample${i}`, last4: String(Math.floor(1000+Math.random()*9000)), routing_number: '110000000' }] : [] },
+                    business_profile: { url: `https://${last.toLowerCase()}-${isIndividual?'freelance':'inc'}.com` }
+                };
+
+                if (isIndividual) {
+                    account.individual = {
+                        first_name: first, last_name: last, email: account.email,
+                        phone: `+1555${String(Math.floor(1000000+Math.random()*9000000))}`,
+                        dob: { day: Math.floor(1+Math.random()*28), month: Math.floor(1+Math.random()*12), year: Math.floor(1965+Math.random()*35) },
+                        address: { line1: `${Math.floor(100+Math.random()*9900)} ${pick(['Main St','Oak Ave','Pine Rd','Elm Blvd','Market St'])}`, city: loc.city, state: loc.state, postal_code: loc.postal, country: 'US' },
+                        verification: { status: hasGaps ? 'pending' : 'verified' }
+                    };
+                } else {
+                    account.company = {
+                        name: pick(companies),
+                        phone: `+1555${String(Math.floor(1000000+Math.random()*9000000))}`,
+                        address: { line1: `${Math.floor(100+Math.random()*9900)} ${pick(['Commerce Blvd','Innovation Dr','Tech Park Way','Business Ave'])}`, city: loc.city, state: loc.state, postal_code: loc.postal, country: 'US' },
+                        tax_id: `${Math.floor(10+Math.random()*90)}-${Math.floor(1000000+Math.random()*9000000)}`,
+                        verification: { status: hasGaps ? 'pending' : 'verified' }
+                    };
+                }
+                sampleAccounts.push(account);
+            }
+
+            // Generate sample transfers
+            const sampleTransfers = [];
+            sampleAccounts.forEach(acct => {
+                const numTransfers = Math.floor(Math.random() * 6);
+                for (let j = 0; j < numTransfers; j++) {
+                    sampleTransfers.push({
+                        id: `tr_sample${Math.random().toString(36).substring(2,10)}`,
+                        amount: Math.floor(5000 + Math.random() * 495000),
+                        currency: 'usd',
+                        destination: acct.id,
+                        created: Math.floor(Date.now()/1000) - Math.floor(Math.random()*15552000),
+                        description: `Payment for services - ${pick(['Q1','Q2','Q3','Q4'])} ${2025+Math.floor(Math.random()*2)}`
+                    });
+                }
+            });
+
+            stripeAccounts = sampleAccounts;
+            stripeTransfers = sampleTransfers;
+            selectedAccountIds = new Set(stripeAccounts.map(a => a.id));
+
+            populatePreview();
+            goToStep(3);
+        }
+
+        // Stripe API fetch
+        async function connectAndFetch() {
+            const apiKey = document.getElementById('stripeKey').value;
+            if (!apiKey.startsWith('sk_test_') && !apiKey.startsWith('sk_live_')) {
+                document.getElementById('fetchError').textContent = 'Please enter a valid Stripe secret key (sk_test_... or sk_live_...)';
+                document.getElementById('fetchError').classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('fetchStatus').classList.remove('hidden');
+            document.getElementById('fetchError').classList.add('hidden');
+            document.getElementById('connectBtn').disabled = true;
+
+            try {
+                // Fetch all connected accounts
+                let allAccounts = [];
+                let hasMore = true;
+                let startingAfter = null;
+
+                document.getElementById('fetchStatusText').textContent = 'Fetching connected accounts...';
+
+                while (hasMore) {
+                    const url = new URL('https://api.stripe.com/v1/accounts');
+                    url.searchParams.set('limit', '100');
+                    if (startingAfter) url.searchParams.set('starting_after', startingAfter);
+
+                    const response = await fetch(url, {
+                        headers: { 'Authorization': `Bearer ${apiKey}` }
+                    });
+
+                    if (!response.ok) throw new Error(`Stripe API error: ${response.status}`);
+
+                    const data = await response.json();
+                    allAccounts = allAccounts.concat(data.data);
+                    hasMore = data.has_more;
+                    if (data.data.length > 0) {
+                        startingAfter = data.data[data.data.length - 1].id;
+                    }
+                    document.getElementById('fetchStatusText').textContent = `Fetched ${allAccounts.length} accounts...`;
+                }
+
+                stripeAccounts = allAccounts;
+                selectedAccountIds = new Set(stripeAccounts.map(a => a.id));
+
+                // Fetch transfers
+                document.getElementById('fetchStatusText').textContent = 'Fetching transfer history...';
+                let allTransfers = [];
+                hasMore = true;
+                startingAfter = null;
+
+                while (hasMore) {
+                    const url = new URL('https://api.stripe.com/v1/transfers');
+                    url.searchParams.set('limit', '100');
+                    if (startingAfter) url.searchParams.set('starting_after', startingAfter);
+
+                    const response = await fetch(url, {
+                        headers: { 'Authorization': `Bearer ${apiKey}` }
+                    });
+
+                    if (!response.ok) break;
+
+                    const data = await response.json();
+                    allTransfers = allTransfers.concat(data.data);
+                    hasMore = data.has_more;
+                    if (data.data.length > 0) {
+                        startingAfter = data.data[data.data.length - 1].id;
+                    }
+                }
+
+                stripeTransfers = allTransfers;
+                populatePreview();
+                goToStep(3);
+
+            } catch (error) {
+                document.getElementById('fetchError').textContent = error.message;
+                document.getElementById('fetchError').classList.remove('hidden');
+            } finally {
+                document.getElementById('fetchStatus').classList.add('hidden');
+                document.getElementById('connectBtn').disabled = false;
+            }
+        }
+
+        // Preview
+        function populatePreview() {
+            const tbody = document.getElementById('previewTable');
+            const typeFilter = document.getElementById('typeFilter').value;
+            tbody.innerHTML = '';
+            let visibleCount = 0;
+
+            stripeAccounts.forEach(account => {
+                if (typeFilter !== 'all' && account.business_type !== typeFilter) return;
+                visibleCount++;
+
+                const name = account.business_type === 'individual'
+                    ? `${account.individual?.first_name || ''} ${account.individual?.last_name || ''}`.trim()
+                    : account.company?.name || account.business_profile?.name || '-';
+
+                const isSelected = selectedAccountIds.has(account.id);
+                const hasGaps = account.requirements?.currently_due?.length > 0 || account.requirements?.past_due?.length > 0;
+
+                const tr = document.createElement('tr');
+                tr.className = `hover:bg-gray-50 ${isSelected ? 'bg-indigo-50' : ''}`;
+                tr.dataset.accountId = account.id;
+                tr.innerHTML = `
+                    <td class="px-4 py-3">
+                        <input type="checkbox" class="account-checkbox rounded text-indigo-600 focus:ring-indigo-500"
+                            data-account-id="${account.id}" ${isSelected ? 'checked' : ''}
+                            onchange="toggleAccount('${account.id}')">
+                    </td>
+                    <td class="px-4 py-3 text-sm font-mono text-gray-600">${account.id.substring(0, 20)}...</td>
+                    <td class="px-4 py-3 text-sm">${account.email || '-'}</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs ${account.business_type === 'individual' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}">
+                            ${account.business_type || 'unknown'}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3 text-sm">${name}</td>
+                    <td class="px-4 py-3 text-sm">${account.country || '-'}</td>
+                    <td class="px-4 py-3 text-sm">
+                        <span class="px-2 py-1 rounded-full text-xs ${hasGaps ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}">
+                            ${hasGaps ? 'Gaps' : 'Complete'}
+                        </span>
+                    </td>`;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('accountCount').textContent = `${stripeAccounts.length} accounts found`;
+            document.getElementById('visibleCount').textContent = visibleCount;
+            updateSelectedCount();
+            updateSelectAllCheckbox();
+        }
+
+        // Selection
+        function toggleAccount(accountId) {
+            if (selectedAccountIds.has(accountId)) { selectedAccountIds.delete(accountId); }
+            else { selectedAccountIds.add(accountId); }
+            updateSelectedCount();
+            updateSelectAllCheckbox();
+            const row = document.querySelector(`tr[data-account-id="${accountId}"]`);
+            if (row) row.classList.toggle('bg-indigo-50', selectedAccountIds.has(accountId));
+        }
+
+        function toggleSelectAll() {
+            const checkbox = document.getElementById('selectAllCheckbox');
+            document.querySelectorAll('.account-checkbox').forEach(cb => {
+                if (checkbox.checked) selectedAccountIds.add(cb.dataset.accountId);
+                else selectedAccountIds.delete(cb.dataset.accountId);
+                cb.checked = checkbox.checked;
+            });
+            updateSelectedCount();
+            populatePreview();
+        }
+
+        function selectAllVisible() {
+            document.querySelectorAll('.account-checkbox').forEach(cb => selectedAccountIds.add(cb.dataset.accountId));
+            document.getElementById('selectAllCheckbox').checked = true;
+            populatePreview();
+        }
+
+        function deselectAll() {
+            selectedAccountIds.clear();
+            document.getElementById('selectAllCheckbox').checked = false;
+            populatePreview();
+        }
+
+        function updateSelectedCount() {
+            document.getElementById('selectedCount').textContent = selectedAccountIds.size;
+            const btn = document.getElementById('continueBtn');
+            btn.disabled = selectedAccountIds.size === 0;
+            btn.classList.toggle('opacity-50', selectedAccountIds.size === 0);
+            btn.classList.toggle('cursor-not-allowed', selectedAccountIds.size === 0);
+        }
+
+        function updateSelectAllCheckbox() {
+            const cbs = document.querySelectorAll('.account-checkbox');
+            document.getElementById('selectAllCheckbox').checked = cbs.length > 0 && Array.from(cbs).every(cb => cb.checked);
+        }
+
+        function filterAccounts() { populatePreview(); }
+
+        function proceedWithSelected() {
+            if (selectedAccountIds.size === 0) { alert('Please select at least one account.'); return; }
+            goToStep(4);
+        }
+
+        function getSelectedAccounts() {
+            return stripeAccounts.filter(a => selectedAccountIds.has(a.id));
+        }
+
+        // Summary Dashboard
+        function populateSummary() {
+            const accounts = getSelectedAccounts();
+            const selectedIds = new Set(accounts.map(a => a.id));
+            const transfers = stripeTransfers.filter(t => selectedIds.has(t.destination));
+
+            const individuals = accounts.filter(a => a.business_type === 'individual');
+            const businesses = accounts.filter(a => a.business_type === 'company');
+
+            // Stat cards
+            document.getElementById('summaryTotal').textContent = accounts.length;
+            document.getElementById('summaryIndividual').textContent = individuals.length;
+            document.getElementById('summaryCompany').textContent = businesses.length;
+            document.getElementById('summaryTransfers').textContent = transfers.length;
+
+            // Verification readiness
+            const withEmail = accounts.filter(a => a.email).length;
+            const withAddress = accounts.filter(a => {
+                const addr = a.business_type === 'individual' ? a.individual?.address : a.company?.address;
+                return addr && addr.line1;
+            }).length;
+            const withBank = accounts.filter(a => a.external_accounts?.data?.length > 0).length;
+            const withGaps = accounts.filter(a => a.requirements?.currently_due?.length > 0 || a.requirements?.past_due?.length > 0).length;
+
+            const pct = (n) => accounts.length > 0 ? Math.round((n / accounts.length) * 100) : 0;
+
+            document.getElementById('summaryHasEmail').textContent = `${withEmail} (${pct(withEmail)}%)`;
+            document.getElementById('summaryEmailBar').style.width = `${pct(withEmail)}%`;
+            document.getElementById('summaryHasAddress').textContent = `${withAddress} (${pct(withAddress)}%)`;
+            document.getElementById('summaryAddressBar').style.width = `${pct(withAddress)}%`;
+            document.getElementById('summaryHasBank').textContent = `${withBank} (${pct(withBank)}%)`;
+            document.getElementById('summaryBankBar').style.width = `${pct(withBank)}%`;
+            document.getElementById('summaryHasGaps').textContent = `${withGaps} (${pct(withGaps)}%)`;
+            document.getElementById('summaryGapsBar').style.width = `${pct(withGaps)}%`;
+
+            // Transfer summary
+            const totalVolume = transfers.reduce((sum, t) => sum + (t.amount || 0), 0);
+            const accountsWithTransfers = new Set(transfers.map(t => t.destination)).size;
+            const countries = [...new Set(accounts.map(a => a.country).filter(Boolean))];
+
+            document.getElementById('summaryTransferCount').textContent = transfers.length.toLocaleString();
+            document.getElementById('summaryTransferVolume').textContent = `$${(totalVolume / 100).toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('summaryWithTransfers').textContent = accountsWithTransfers;
+            document.getElementById('summaryCountries').textContent = countries.join(', ') || '-';
+
+            // File previews
+            document.getElementById('summaryRecipientsCsvCount').textContent = accounts.length;
+            document.getElementById('summaryRecipientsJsonCount').textContent = accounts.length;
+            document.getElementById('summaryIndivVerifCount').textContent = individuals.length;
+            document.getElementById('summaryBizVerifCount').textContent = businesses.length;
+            document.getElementById('summaryPaymentsCount').textContent = transfers.length;
+        }
+
+        // Export
+        function updateExportCounts() {
+            const accounts = getSelectedAccounts();
+            const selectedIds = new Set(accounts.map(a => a.id));
+            const transfers = stripeTransfers.filter(t => selectedIds.has(t.destination));
+            const individuals = accounts.filter(a => a.business_type === 'individual');
+            const businesses = accounts.filter(a => a.business_type === 'company');
+
+            document.getElementById('exportRecipientCount').textContent = `${accounts.length} recipients ready`;
+            document.getElementById('exportIndivVerifCount').textContent = `${individuals.length} verifications`;
+            document.getElementById('exportBizVerifCount').textContent = `${businesses.length} verifications`;
+            document.getElementById('exportPaymentCount').textContent = `${transfers.length} historical payments`;
+        }
+
+        function executeExport() {
+            const downloads = [];
+            const accounts = getSelectedAccounts();
+            const selectedIds = new Set(accounts.map(a => a.id));
+            const transfers = stripeTransfers.filter(t => selectedIds.has(t.destination));
+            const individuals = accounts.filter(a => a.business_type === 'individual');
+            const businesses = accounts.filter(a => a.business_type === 'company');
+
+            if (document.getElementById('exportRecipientsCsv').checked) {
+                downloads.push({ name: 'recipients.csv', content: generateRecipientsCsv(accounts), type: 'text/csv' });
+            }
+            if (document.getElementById('exportRecipientsApi').checked) {
+                downloads.push({ name: 'recipients_api.json', content: generateRecipientsJson(accounts), type: 'application/json' });
+            }
+            if (document.getElementById('exportIndivVerif').checked && individuals.length > 0) {
+                downloads.push({ name: 'individual_verifications.csv', content: generateIndividualVerificationsCsv(individuals), type: 'text/csv' });
+            }
+            if (document.getElementById('exportBizVerif').checked && businesses.length > 0) {
+                downloads.push({ name: 'business_verifications.csv', content: generateBusinessVerificationsCsv(businesses), type: 'text/csv' });
+            }
+            if (document.getElementById('exportPayments').checked && transfers.length > 0) {
+                downloads.push({ name: 'offline_payments.csv', content: generatePaymentsCsv(accounts, transfers), type: 'text/csv' });
+            }
+
+            const linksDiv = document.getElementById('downloadLinks');
+            linksDiv.innerHTML = '';
+
+            downloads.forEach(dl => {
+                const blob = new Blob([dl.content], { type: dl.type });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = dl.name;
+                link.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100';
+                link.innerHTML = `
+                    <span class="flex items-center space-x-2">
+                        <span class="text-lg">${dl.type.includes('json') ? '📄' : '📊'}</span>
+                        <span class="font-medium">${dl.name}</span>
+                    </span>
+                    <span class="text-indigo-600 text-sm">Download →</span>`;
+                linksDiv.appendChild(link);
+            });
+
+            if (downloads.length > 0) {
+                document.getElementById('exportResults').classList.remove('hidden');
+            }
+
+            // Trolley API creation
+            if (document.getElementById('exportTrolleyApi').checked) {
+                createRecipientsViaTrolleyApi(accounts);
+            }
+        }
+
+        // CSV Generators
+        function toggleTrolleyConfig() {
+            const fields = document.getElementById('trolleyConfigFields');
+            fields.classList.toggle('hidden', !document.getElementById('exportTrolleyApi').checked);
+        }
+
+        // Trolley API - HMAC-SHA256 Auth
+        async function trolleyHmacSign(secretKey, message) {
+            const encoder = new TextEncoder();
+            const key = await crypto.subtle.importKey('raw', encoder.encode(secretKey), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+            const sig = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
+            return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,'0')).join('');
+        }
+
+        async function createTrolleyRecipient(accessKey, secretKey, recipientData) {
+            const timestamp = Math.floor(Date.now() / 1000).toString();
+            const method = 'POST';
+            const path = '/v1/recipients/';
+            const body = JSON.stringify(recipientData);
+
+            const message = `${timestamp}\n${method}\n${path}\n${body}\n`;
+            const signature = await trolleyHmacSign(secretKey, message);
+
+            const response = await fetch('https://api.trolley.com/v1/recipients/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `prsign ${accessKey}:${signature}`,
+                    'X-PR-Timestamp': timestamp,
+                    'Content-Type': 'application/json'
+                },
+                body: body
+            });
+
+            return await response.json();
+        }
+
+        async function createRecipientsViaTrolleyApi(accounts) {
+            const accessKey = document.getElementById('trolleyAccessKey').value;
+            const secretKey = document.getElementById('trolleySecretKey').value;
+
+            if (!accessKey || !secretKey) {
+                alert('Please enter your Trolley API keys.');
+                return;
+            }
+
+            document.getElementById('trolleyApiResults').classList.remove('hidden');
+            document.getElementById('trolleyResultSummary').classList.add('hidden');
+
+            let success = 0;
+            let failed = 0;
+            const errors = [];
+
+            for (let i = 0; i < accounts.length; i++) {
+                const account = accounts[i];
+                const isIndividual = account.business_type === 'individual';
+
+                const recipientData = {
+                    referenceId: account.id,
+                    email: account.email || `recipient${i}@migration.example`,
+                    type: isIndividual ? 'individual' : 'business',
+                };
+
+                if (isIndividual) {
+                    recipientData.firstName = account.individual?.first_name || 'Unknown';
+                    recipientData.lastName = account.individual?.last_name || 'Unknown';
+                } else {
+                    recipientData.name = account.company?.name || 'Unknown Business';
+                }
+
+                try {
+                    const result = await createTrolleyRecipient(accessKey, secretKey, recipientData);
+                    if (result.ok) {
+                        success++;
+                    } else {
+                        failed++;
+                        const errMsg = result.errors?.[0]?.message || 'Unknown error';
+                        errors.push(`${recipientData.email}: ${errMsg}`);
+                    }
+                } catch (e) {
+                    failed++;
+                    errors.push(`${recipientData.email}: ${e.message}`);
+                }
+
+                // Update progress
+                const total = accounts.length;
+                const done = i + 1;
+                document.getElementById('trolleyProgressText').textContent = `Creating recipients... ${done}/${total}`;
+                document.getElementById('trolleyProgressCount').textContent = `${done}/${total}`;
+                document.getElementById('trolleyProgressBar').style.width = `${(done/total)*100}%`;
+
+                // Small delay to avoid rate limiting
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            // Show results
+            document.getElementById('trolleyProgressText').textContent = 'Complete';
+            document.getElementById('trolleyResultSummary').classList.remove('hidden');
+            document.getElementById('trolleySuccessCount').textContent = success;
+            document.getElementById('trolleyFailCount').textContent = failed;
+
+            if (errors.length > 0) {
+                const errDiv = document.getElementById('trolleyErrors');
+                errDiv.classList.remove('hidden');
+                errDiv.innerHTML = errors.map(e => `<div>• ${e}</div>`).join('');
+            }
+        }
+
+        function generateRecipientsCsv(accounts) {
+            const headers = ['Reference ID','Email','Type','First Name','Last Name','Name','Country','Street 1','Street 2','City','Region','Postal Code','Phone','Tags'];
+            const rows = accounts.map(a => {
+                const isInd = a.business_type === 'individual';
+                const ind = a.individual || {};
+                const co = a.company || {};
+                const addr = isInd ? (ind.address || {}) : (co.address || {});
+                return [a.id, a.email||'', isInd?'Individual':'Business', isInd?(ind.first_name||''):'', isInd?(ind.last_name||''):'',
+                    isInd?'':(co.name||''), a.country||'', addr.line1||'', addr.line2||'', addr.city||'', addr.state||'',
+                    addr.postal_code||'', isInd?(ind.phone||''):(co.phone||''), 'stripe-migration'];
+            });
+            return [headers,...rows].map(r => r.map(c => `"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+        }
+
+        function generateRecipientsJson(accounts) {
+            const recipients = accounts.map(a => {
+                const isInd = a.business_type === 'individual';
+                return { referenceId: a.id, email: a.email||'', type: isInd?'individual':'business',
+                    firstName: isInd?(a.individual?.first_name||''):'', lastName: isInd?(a.individual?.last_name||''):'',
+                    name: isInd?'':(a.company?.name||''), country: a.country||'' };
+            });
+            return JSON.stringify({ recipients, generatedAt: new Date().toISOString(), source: 'stripe-connect', totalCount: recipients.length }, null, 2);
+        }
+
+        function generateIndividualVerificationsCsv(individuals) {
+            const headers = ['Email','Recipient ID','Decision Date','Status','Reason Type','Issued Date','Expiration Date','Document Type','First Name','Last Name','Address 1','Address 2','City','Region','Country','Date Of Birth','Postal Code','Document Issuing Country'];
+            const today = new Date().toISOString().split('T')[0];
+            const rows = individuals.map(a => {
+                const ind = a.individual||{};
+                const addr = ind.address||{};
+                const dob = ind.dob||{};
+                const dobStr = dob.year ? `${dob.year}-${String(dob.month).padStart(2,'0')}-${String(dob.day).padStart(2,'0')}` : '';
+                const hasReqs = a.requirements?.currently_due?.length > 0;
+                return [a.email||'', '', today, hasReqs?'pending':'verified', '', '', '', 'government_id',
+                    ind.first_name||'', ind.last_name||'', addr.line1||'', addr.line2||'', addr.city||'',
+                    addr.state||'', a.country||'', dobStr, addr.postal_code||'', a.country||''];
+            });
+            return [headers,...rows].map(r => r.map(c => `"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+        }
+
+        function generateBusinessVerificationsCsv(businesses) {
+            const headers = ['Email','Recipient ID','Decision Date','Document Type','Status','Reason Type','Name','Business Registration Number','Address 1','Address 2','City','Region','Country'];
+            const today = new Date().toISOString().split('T')[0];
+            const rows = businesses.map(a => {
+                const co = a.company||{};
+                const addr = co.address||{};
+                const hasReqs = a.requirements?.currently_due?.length > 0;
+                return [a.email||'', '', today, 'registration_document', hasReqs?'pending':'verified', '',
+                    co.name||'', co.tax_id||'', addr.line1||'', addr.line2||'', addr.city||'', addr.state||'', a.country||''];
+            });
+            return [headers,...rows].map(r => r.map(c => `"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+        }
+
+        function generatePaymentsCsv(accounts, transfers) {
+            const headers = ['Email','Reference ID','Recipient ID','Amount','Currency','Cover Fees','Taxable','Payment Reason','US Tax Activity','Memo','Tags','External Id'];
+            const rows = transfers.map(t => {
+                const acct = accounts.find(a => a.id === t.destination);
+                return [acct?.email||'', t.destination||'', '', (t.amount/100).toFixed(2), t.currency?.toUpperCase()||'USD',
+                    '', '', '', '', t.description||`Transfer ${t.id}`, 'stripe-historical', t.id];
+            });
+            return [headers,...rows].map(r => r.map(c => `"${(c||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+        }
+    </script>
+</body>
+</html>
